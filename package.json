@@ -1,0 +1,28 @@
+{
+  "name": "potfolio3d",
+  "version": "1.0.0",
+  "description": "Personal portfolio",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --mode development --open",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umurcg/potfolio3D.git"
+  },
+  "author": "umurcg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/umurcg/potfolio3D/issues"
+  },
+  "homepage": "https://github.com/umurcg/potfolio3D#readme",
+  "dependencies": {
+    "three": "^0.158.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
