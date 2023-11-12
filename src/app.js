@@ -1,44 +1,88 @@
-// Import Three.js (skip if you're including Three.js via a script tag in your HTML)
 import * as THREE from 'three';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
-// Set up the scene, camera, and renderer
+
+// Basic setup
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xB0E0E6);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Create a cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// Font loader
+const loader = new FontLoader();
+loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+    const geometry = new TextGeometry('UMURCG', {
+        font: font,
+        size: 40,
+        height: 5,
+        curveSegments: 10,
+        bevelEnabled: true,
+        bevelThickness: 2,
+        bevelSize: 0.5,
+        bevelOffset: 0,
+        bevelSegments: 5
+    });
+    
+    const material = new THREE.MeshBasicMaterial({ color: 0x111111 });
+    const textMesh = new THREE.Mesh(geometry, material);
 
-// Position the camera
-camera.position.z = 5;
+    // Center the text
+    geometry.computeBoundingBox();
+    const offset = geometry.boundingBox.getCenter(new THREE.Vector3()).negate();
+    geometry.translate(offset.x, offset.y, offset.z);
+    
+    scene.add(textMesh);
 
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
 
-    // Rotate the cube
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    function GenerateRandomDirection() {
+        let localDirection = new THREE.Vector3();
+        localDirection.x = Math.random() * 2 - 1;
+        localDirection.y = Math.random() * 2 - 1;
+        localDirection.z = 0;
+        localDirection.normalize();
+        return localDirection;
+    }
 
-    // Render the scene
-    renderer.render(scene, camera);
-}
+    function IsTextMeshOutsideOfScreen(textMesh) {
+        let localPosition = new THREE.Vector3();
+        localPosition.copy(textMesh.position);
+        localPosition.project(camera);
 
-// Start the animation loop
-animate();
+    
+        return Math.abs(localPosition.x) > 1 || Math.abs(localPosition.y) > 1;
+    }
 
-// Handle window resize
-window.addEventListener('resize', () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    GenerateRandomDirection();
+    let direction = GenerateRandomDirection();
+    const speed = 1;
+    const rotationSpeed = 0.01;
+    
 
-    // Update camera aspect ratio and renderer size
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
+    // Animation
+    const animate = function () {
+        requestAnimationFrame(animate);
+
+        textMesh.rotateY(rotationSpeed);
+        textMesh.rotateX(-rotationSpeed);
+    
+
+        // // Bouncing logic (simplified example)
+        textMesh.translateX(direction.x * speed);
+        textMesh.translateY(direction.y * speed);
+
+        if (IsTextMeshOutsideOfScreen(textMesh)) {
+            direction = GenerateRandomDirection();
+        }
+        
+        renderer.render(scene, camera);
+    };
+
+    
+    
+    animate();
 });
+
+camera.position.z = 500;
